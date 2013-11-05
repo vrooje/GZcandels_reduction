@@ -1,7 +1,11 @@
 GZcandels_reduction
 ===================
 
-Galaxy Zoo-CANDELS data reduction
+Galaxy Zoo-CANDELS data reduction: in progress.
+
+Note: this repository is public, but the database of classifications is not. Currently the raw database *and* the classifications files that results from running the code here is stored in a separate directory (../classifications/) which is not synced here.
+
+## To run
 
 Step 1: Download database dump in csv format.
 
