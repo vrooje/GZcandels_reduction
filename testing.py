@@ -153,8 +153,5 @@ for index, s in enumerate(bigdata.field('db_id')) :
     if s == '504e468dc499611ea600cb69' :
         print index, s
     
-    
-    
-
 
 #bigtable.writeto('newtable.fits')
