@@ -17,3 +17,7 @@ Note: this repository is public, but the database of classifications is not. Cur
 
 - Step 4: run combine_duplicates.py to remove duplicates from intended 2- and 6-orbit depths
 
+    > ./fix_raw_classifications.sh 2013-11-03_galaxy_zoo_classifications.csv
+    > ./extract_candels_ids.sh 2013-11-03_galaxy_zoo_classifications.csv
+    > python collate_candels.py 2013-11-03_galaxy_zoo_classifications.csv
+    > python collate_candels.py classifications/candels_classifications_collated.fits
