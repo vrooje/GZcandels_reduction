@@ -11,9 +11,9 @@ Note: this repository is public, but the database of classifications is not. Cur
 
 - Step 1a: Run fix_raw_classifications.sh to edit header line of csv file to remove weird formatting in first column.
 
-- Step 2: Currently I extract only the CANDELS db_ids using a simple awk script, but this may not be strictly necessary.
+- Step 2: Select only the CANDELS galaxies using extract_candels_ids.sh
 
-- Step 3: run collate_candels.py
+- Step 3: run collate_candels.py to collate votes
 
-- Step 4: run combine_duplicates.py
+- Step 4: run combine_duplicates.py to remove duplicates from intended 2- and 6-orbit depths
 
