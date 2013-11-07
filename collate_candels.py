@@ -1,14 +1,20 @@
 import sys
 import fileinput
-import pyfits
 import numpy as np
 import matplotlib.pyplot as plt
-from pyfits import Column
+
+try:
+    from astropy.io import fits as pyfits
+    from astropy.io.fits import Column
+except ImportError:
+    import pyfits
+    from pyfits import Column
 
 # This is the fits file that maps all the IDs to one another:
 #
-subjinfo_file = '../classifications/CANDELS_ZooID_dbID_location_match.fits'
-print 'Reading', subjinfo_file, '...'
+path_class = 'classifications'
+subjinfo_file = '%s/CANDELS_ZooID_dbID_location_match.fits' % path_class
+print 'Reading %s ...' % subjinfo_file
 q = pyfits.open(subjinfo_file, memmap=True)
 subjinfo = q[1].data
 #
@@ -144,8 +150,16 @@ print 'Reading classifications file...'
 
 # 5 + 18 + 12 + 12 + 19 = 66
 # Now open the classifications csv and fill an object with it
-with open('2013-10-27_galaxy_zoo_classifications_CANDELSonly.csv') as f:
-    subjClass = np.loadtxt(f, delimiter=",", dtype={'names':('classification_id','subject_id','user_id','created_at','lang', 'candels_0','candels_1','candels_2','candels_3','candels_4','candels_5','candels_6','candels_7','candels_8','candels_9','candels_10', 'candels_11','candels_12','candels_13','candels_14','candels_15','candels_16','candels_17', 'sloan_0','sloan_1','sloan_2','sloan_3','sloan_4','sloan_5','sloan_6','sloan_7','sloan_8','sloan_9','sloan_10','sloan_11', 'ukidss_0','ukidss_1','ukidss_2','ukidss_3','ukidss_4','ukidss_5','ukidss_6','ukidss_7','ukidss_8','ukidss_9','ukidss_10','ukidss_11', 'ferengi_0','ferengi_1','ferengi_2','ferengi_3','ferengi_4','ferengi_5','ferengi_6','ferengi_7','ferengi_8','ferengi_9','ferengi_10', 'ferengi_11','ferengi_12','ferengi_13','ferengi_14','ferengi_15','ferengi_16','ferengi_17','ferengi_18'), 'formats':('S24','S24','S24','S19','S3', 'S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4', 'S4','S4','S4','S4','S4','S4','S4', 'S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4', 'S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4', 'S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4', 'S4','S4','S4','S4','S4','S4','S4','S4' )},skiprows=1)
+
+try:
+    sys.argv[1]
+except NameError:
+    candels_file = '2013-10-27_galaxy_zoo_classifications_CANDELSonly.csv'
+else:
+    candels_file = sys.argv[1]
+
+with open(candels_file) as f:
+    subjClass = np.loadtxt(f, delimiter=",", dtype={'names':('classification_id','subject_id','user_id','created_at','lang', 'candels_0','candels_1','candels_2','candels_3','candels_4','candels_5','candels_6','candels_7','candels_8','candels_9','candels_10', 'candels_11','candels_12','candels_13','candels_14','candels_15','candels_16','candels_17', 'sloan_0','sloan_1','sloan_2','sloan_3','sloan_4','sloan_5','sloan_6','sloan_7','sloan_8','sloan_9','sloan_10','sloan_11', 'ukidss_0','ukidss_1','ukidss_2','ukidss_3','ukidss_4','ukidss_5','ukidss_6','ukidss_7','ukidss_8','ukidss_9','ukidss_10','ukidss_11', 'ferengi_0','ferengi_1','ferengi_2','ferengi_3','ferengi_4','ferengi_5','ferengi_6','ferengi_7','ferengi_8','ferengi_9','ferengi_10', 'ferengi_11','ferengi_12','ferengi_13','ferengi_14','ferengi_15','ferengi_16','ferengi_17','ferengi_18'), 'formats':('S24','S24','S24','S19','S3', 'S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4', 'S4','S4','S4','S4','S4','S4','S4', 'S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4', 'S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4', 'S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4', 'S4','S4','S4','S4','S4','S4','S4','S4' )},skiprows=0)
 
 print '...done.'
 # Note: the full headers are:
@@ -555,7 +569,7 @@ for index, s in enumerate(subjDB.data.field('db_id')) :
     #There is probably a better way to do this than manually but WHATEVER
     #print 'Calculating fractions...'
     if index % 1000 == 0 :
-        print 'Done ', index, '...'
+        print 'Done %5i ...' % index
     
     if subjDB.data.field('t00_smooth_and_rounded_count')[index] > 0 :
         subjDB.data.field('t00_smooth_and_rounded_a0_smooth_frac')[index]   /= subjDB.data.field('t00_smooth_and_rounded_count')[index]
@@ -743,9 +757,4 @@ for index, s in enumerate(subjDB.data.field('db_id')) :
 print '...Done.'
 
 
-subjDB.writeto('../classifications/candels_classifications_collated.fits')
-
-
-
-
-
+subjDB.writeto('%s/candels_classifications_collated.fits' % path_class, clobber=True)
