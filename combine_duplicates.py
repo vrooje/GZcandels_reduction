@@ -48,19 +48,19 @@ for k, dup_set in enumerate(subjDB.data[second_set]) :
         
     subjDB.data.field('num_classifications')[index_orig] = subjDB.data.field('num_classifications')[index_orig] + subjDB.data.field('num_classifications')[index]
     
-    # t00_smooth_and_rounded:
+    # t00_smooth_or_featured:
     #    a0_smooth
     #    a1_features
     #    a2_artifact
     #    count
-    if subjDB.data.field('t00_smooth_and_rounded_count')[index] > 0 :
-        count_dup  = subjDB.data.field('t00_smooth_and_rounded_count')[index]
-        count_orig = subjDB.data.field('t00_smooth_and_rounded_count')[index_orig]
+    if subjDB.data.field('t00_smooth_or_featured_count')[index] > 0 :
+        count_dup  = subjDB.data.field('t00_smooth_or_featured_count')[index]
+        count_orig = subjDB.data.field('t00_smooth_or_featured_count')[index_orig]
         count_tot  = count_dup + count_orig
-        subjDB.data.field('t00_smooth_and_rounded_a0_smooth_frac')[index_orig]   = ((count_orig * subjDB.data.field('t00_smooth_and_rounded_a0_smooth_frac')[index_orig]) + (count_dup * subjDB.data.field('t00_smooth_and_rounded_a0_smooth_frac')[index]))/float(count_tot)
-        subjDB.data.field('t00_smooth_and_rounded_a1_features_frac')[index_orig] = ((count_orig * subjDB.data.field('t00_smooth_and_rounded_a1_features_frac')[index_orig]) + (count_dup * subjDB.data.field('t00_smooth_and_rounded_a1_features_frac')[index]))/float(count_tot)
-        subjDB.data.field('t00_smooth_and_rounded_a2_artifact_frac')[index_orig] = ((count_orig * subjDB.data.field('t00_smooth_and_rounded_a2_artifact_frac')[index_orig]) + (count_dup * subjDB.data.field('t00_smooth_and_rounded_a2_artifact_frac')[index]))/float(count_tot)
-        subjDB.data.field('t00_smooth_and_rounded_count')[index_orig] = count_tot
+        subjDB.data.field('t00_smooth_or_featured_a0_smooth_frac')[index_orig]   = ((count_orig * subjDB.data.field('t00_smooth_or_featured_a0_smooth_frac')[index_orig]) + (count_dup * subjDB.data.field('t00_smooth_or_featured_a0_smooth_frac')[index]))/float(count_tot)
+        subjDB.data.field('t00_smooth_or_featured_a1_features_frac')[index_orig] = ((count_orig * subjDB.data.field('t00_smooth_or_featured_a1_features_frac')[index_orig]) + (count_dup * subjDB.data.field('t00_smooth_or_featured_a1_features_frac')[index]))/float(count_tot)
+        subjDB.data.field('t00_smooth_or_featured_a2_artifact_frac')[index_orig] = ((count_orig * subjDB.data.field('t00_smooth_or_featured_a2_artifact_frac')[index_orig]) + (count_dup * subjDB.data.field('t00_smooth_or_featured_a2_artifact_frac')[index]))/float(count_tot)
+        subjDB.data.field('t00_smooth_or_featured_count')[index_orig] = count_tot
     
     
     

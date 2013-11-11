@@ -54,10 +54,10 @@ floatcolumn = subjinfo.magnitude - subjinfo.magnitude
 
 c01 = Column(name='num_classifications', format='J', array=intcolumn)
                        
-c02 = Column(name='t00_smooth_and_rounded_a0_smooth_frac', format='D', array=floatcolumn)
-c03 = Column(name='t00_smooth_and_rounded_a1_features_frac', format='D', array=floatcolumn)
-c04 = Column(name='t00_smooth_and_rounded_a2_artifact_frac', format='D', array=floatcolumn)
-c05 = Column(name='t00_smooth_and_rounded_count', format='J', array=intcolumn)
+c02 = Column(name='t00_smooth_or_featured_a0_smooth_frac', format='D', array=floatcolumn)
+c03 = Column(name='t00_smooth_or_featured_a1_features_frac', format='D', array=floatcolumn)
+c04 = Column(name='t00_smooth_or_featured_a2_artifact_frac', format='D', array=floatcolumn)
+c05 = Column(name='t00_smooth_or_featured_count', format='J', array=intcolumn)
 
 c06 = Column(name='t01_how_rounded_a0_completely_frac', format='D', array=floatcolumn)
 c07 = Column(name='t01_how_rounded_a1_inbetween_frac', format='D', array=floatcolumn)
@@ -247,23 +247,23 @@ for index, s in enumerate(subjDB.data.field('db_id')) :
     for c in subjClass[this_subj] :
         subjDB.data.field('num_classifications')[index] += 1
         
-        # t00_smooth_and_rounded:
+        # t00_smooth_or_featured:
         #    a0_smooth
         #    a1_features
         #    a2_artifact
         #    count
 
         if c['candels_0'] == 'a-0' :
-            subjDB.data.field('t00_smooth_and_rounded_a0_smooth_frac')[index] += 1.0
-            subjDB.data.field('t00_smooth_and_rounded_count')[index] += 1
+            subjDB.data.field('t00_smooth_or_featured_a0_smooth_frac')[index] += 1.0
+            subjDB.data.field('t00_smooth_or_featured_count')[index] += 1
 
         if c['candels_0'] == 'a-1' :
-            subjDB.data.field('t00_smooth_and_rounded_a1_features_frac')[index] += 1.0
-            subjDB.data.field('t00_smooth_and_rounded_count')[index] += 1
+            subjDB.data.field('t00_smooth_or_featured_a1_features_frac')[index] += 1.0
+            subjDB.data.field('t00_smooth_or_featured_count')[index] += 1
 
         if c['candels_0'] == 'a-2' :
-            subjDB.data.field('t00_smooth_and_rounded_a2_artifact_frac')[index] += 1.0
-            subjDB.data.field('t00_smooth_and_rounded_count')[index] += 1
+            subjDB.data.field('t00_smooth_or_featured_a2_artifact_frac')[index] += 1.0
+            subjDB.data.field('t00_smooth_or_featured_count')[index] += 1
 
 
         # t01_how_rounded:
@@ -570,14 +570,14 @@ for index, s in enumerate(subjDB.data.field('db_id')) :
     if index % 1000 == 0 :
         print 'Done %5i ...' % index
     
-    if subjDB.data.field('t00_smooth_and_rounded_count')[index] > 0 :
-        subjDB.data.field('t00_smooth_and_rounded_a0_smooth_frac')[index]   /= subjDB.data.field('t00_smooth_and_rounded_count')[index]
-        subjDB.data.field('t00_smooth_and_rounded_a1_features_frac')[index] /= subjDB.data.field('t00_smooth_and_rounded_count')[index]
-        subjDB.data.field('t00_smooth_and_rounded_a2_artifact_frac')[index] /= subjDB.data.field('t00_smooth_and_rounded_count')[index]
+    if subjDB.data.field('t00_smooth_or_featured_count')[index] > 0 :
+        subjDB.data.field('t00_smooth_or_featured_a0_smooth_frac')[index]   /= subjDB.data.field('t00_smooth_or_featured_count')[index]
+        subjDB.data.field('t00_smooth_or_featured_a1_features_frac')[index] /= subjDB.data.field('t00_smooth_or_featured_count')[index]
+        subjDB.data.field('t00_smooth_or_featured_a2_artifact_frac')[index] /= subjDB.data.field('t00_smooth_or_featured_count')[index]
     else :
-        subjDB.data.field('t00_smooth_and_rounded_a0_smooth_frac')[index]   = 0.0
-        subjDB.data.field('t00_smooth_and_rounded_a1_features_frac')[index] = 0.0
-        subjDB.data.field('t00_smooth_and_rounded_a2_artifact_frac')[index] = 0.0
+        subjDB.data.field('t00_smooth_or_featured_a0_smooth_frac')[index]   = 0.0
+        subjDB.data.field('t00_smooth_or_featured_a1_features_frac')[index] = 0.0
+        subjDB.data.field('t00_smooth_or_featured_a2_artifact_frac')[index] = 0.0
     
     
     if subjDB.data.field('t01_how_rounded_count')[index] > 0 :
