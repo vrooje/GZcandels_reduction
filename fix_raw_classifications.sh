@@ -1,8 +1,9 @@
 #!/bin/bash
 
-# Shell script removes the corrupted header line on raw classification data
+# Shell script removes the corrupted header line on raw classification data. 
+# Deprecated as of 17 Nov 2013; CSV file when downloaded from servers now has correct header.
 
-# K. Willett, UMN, 06 Nov 2013
+# Originally written by K. Willett, UMN, 06 Nov 2013
 
 TMP=$(mktemp)
 HEADER_FILE='headers.csv'
