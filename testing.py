@@ -4,6 +4,9 @@ import pyfits
 import numpy as np
 import matplotlib.pyplot as plt
 from pyfits import Column
+
+path_class = '../classifications'
+
 #
 # This is a file where I can test random stuff on pieces of the DB, or test parts of 
 # algorithms, or just experiment to familiarize myself with Python.
@@ -154,4 +157,13 @@ for index, s in enumerate(bigdata.field('db_id')) :
         print index, s
     
 
-#bigtable.writeto('newtable.fits')
+try:
+    sys.argv[2]
+except IndexError:
+    collated_file = '%s/newtable.fits' % path_class
+else:
+    collated_file = sys.argv[2]
+
+bigtable.writeto(collated_file)
+print 'Okay then'
+

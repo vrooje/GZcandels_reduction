@@ -9,9 +9,11 @@ except ImportError:
     import pyfits
     from pyfits import Column
 
+# This is where we store the raw and collated classification files
+path_class = '../classifications'
+
 # This is the fits file that maps all the IDs to one another:
 #
-path_class = 'classifications'
 subjinfo_file = '%s/CANDELS_ZooID_dbID_location_match.fits' % path_class
 print 'Reading %s ...' % subjinfo_file
 q = pyfits.open(subjinfo_file, memmap=True)
@@ -145,17 +147,17 @@ classifications = pyfits.new_table([c01,c02,c03,c04,c05,c06,c07,c08,c09,c10,c11,
 qq = q[1].columns + classifications.columns
 subjDB = pyfits.new_table(qq)
 
-print 'Reading classifications file...'
+try:
+    sys.argv[1]
+except IndexError:
+    candels_file = '%s/2013-10-27_galaxy_zoo_classifications_CANDELSonly.csv' % path_class
+else:
+    candels_file = sys.argv[1]
+
+print 'Reading classifications file', candels_file, '...'
 
 # 5 + 18 + 12 + 12 + 19 = 66
 # Now open the classifications csv and fill an object with it
-
-try:
-    sys.argv[1]
-except NameError:
-    candels_file = '2013-10-27_galaxy_zoo_classifications_CANDELSonly.csv'
-else:
-    candels_file = sys.argv[1]
 
 with open(candels_file) as f:
     subjClass = np.loadtxt(f, delimiter=",", dtype={'names':('classification_id','subject_id','user_id','created_at','lang', 'candels_0','candels_1','candels_2','candels_3','candels_4','candels_5','candels_6','candels_7','candels_8','candels_9','candels_10', 'candels_11','candels_12','candels_13','candels_14','candels_15','candels_16','candels_17', 'sloan_0','sloan_1','sloan_2','sloan_3','sloan_4','sloan_5','sloan_6','sloan_7','sloan_8','sloan_9','sloan_10','sloan_11', 'ukidss_0','ukidss_1','ukidss_2','ukidss_3','ukidss_4','ukidss_5','ukidss_6','ukidss_7','ukidss_8','ukidss_9','ukidss_10','ukidss_11', 'ferengi_0','ferengi_1','ferengi_2','ferengi_3','ferengi_4','ferengi_5','ferengi_6','ferengi_7','ferengi_8','ferengi_9','ferengi_10', 'ferengi_11','ferengi_12','ferengi_13','ferengi_14','ferengi_15','ferengi_16','ferengi_17','ferengi_18'), 'formats':('S24','S24','S24','S19','S3', 'S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4', 'S4','S4','S4','S4','S4','S4','S4', 'S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4', 'S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4', 'S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4', 'S4','S4','S4','S4','S4','S4','S4','S4' )},skiprows=0)
@@ -753,7 +755,17 @@ for index, s in enumerate(subjDB.data.field('db_id')) :
         subjDB.data.field('t16_merging_tidal_debris_a3_neither_frac')[index]      = 0.0
 
 
+
+try:
+    sys.argv[2]
+except IndexError:
+    collated_file = '%s/candels_classifications_collated.fits' % path_class
+else:
+    collated_file = sys.argv[2]
+
+
+subjDB.writeto(collated_file, clobber=True)
+
 print '...Done.'
 
 
-subjDB.writeto('%s/candels_classifications_collated.fits' % path_class, clobber=True)
