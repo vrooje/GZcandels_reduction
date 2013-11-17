@@ -9,13 +9,11 @@ Note: this repository is public, but the database of classifications is not. Cur
 
 - Step 0: Download database dump in csv format.
 
-- Step 1: Edit header line to remove weird formatting in first column
+- Step 1: Select only the CANDELS galaxies
 
-- Step 2: Select only the CANDELS galaxies
+- Step 2: Collate votes
 
-- Step 3: Collate votes
-
-- Step 4: Remove duplicates from intended 2- and 6-orbit depths
+- Step 3: Remove duplicates from intended 2- and 6-orbit depths
 
 ```
     ./fix_raw_classifications.sh 2013-11-03_galaxy_zoo_classifications.csv
