@@ -5,13 +5,13 @@ try:
 except ImportError:
     import pyfits
 
-path_class = 'classifications'
+path_class = '../classifications'
 
 # This is the fits file that maps all the IDs to one another:
 #
 try:
     sys.argv[1]
-except NameError,IndexError:
+except IndexError:
     subjinfo_file = '%s/candels_classifications_collated.fits' % path_class
 else:
     subjinfo_file = sys.argv[1]
@@ -19,6 +19,11 @@ else:
 print 'Reading %s ...' % subjinfo_file
 q = pyfits.open(subjinfo_file, memmap=True)
 subjDB = q[1]
+
+# trying something
+# nope, didn't speed anything up, but then again it was a very half-ass try.
+#r = pyfits.open(subjinfo_file, memmap=True)
+#subjDB_dup = r[1]
 
 # normal IDs are survey and number, e.g. 'GDS_12345'. 
 # examples where a second image of the same galaxy was inserted are e.g. 'GDS_12345_2'.
