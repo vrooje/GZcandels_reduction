@@ -31,7 +31,7 @@ subjinfo = q[1].data
 #       The H-band magnitude of the CANDELS image. Not really needed here.
 #
 #   db_id
-#       The database id, aka the classification id, which is the only id in both this and the classifications file.
+#       The database id, which is the only id in both this and the classifications file.
 #
 #   zooniverse_id
 #       The overall Zooniverse id, e.g. AGZ1234567.
@@ -160,7 +160,7 @@ print 'Reading classifications file', candels_file, '...'
 # Now open the classifications csv and fill an object with it
 
 with open(candels_file) as f:
-    subjClass = np.loadtxt(f, delimiter=",", dtype={'names':('classification_id','subject_id','user_id','created_at','lang', 'candels_0','candels_1','candels_2','candels_3','candels_4','candels_5','candels_6','candels_7','candels_8','candels_9','candels_10', 'candels_11','candels_12','candels_13','candels_14','candels_15','candels_16','candels_17', 'sloan_0','sloan_1','sloan_2','sloan_3','sloan_4','sloan_5','sloan_6','sloan_7','sloan_8','sloan_9','sloan_10','sloan_11', 'ukidss_0','ukidss_1','ukidss_2','ukidss_3','ukidss_4','ukidss_5','ukidss_6','ukidss_7','ukidss_8','ukidss_9','ukidss_10','ukidss_11', 'ferengi_0','ferengi_1','ferengi_2','ferengi_3','ferengi_4','ferengi_5','ferengi_6','ferengi_7','ferengi_8','ferengi_9','ferengi_10', 'ferengi_11','ferengi_12','ferengi_13','ferengi_14','ferengi_15','ferengi_16','ferengi_17','ferengi_18'), 'formats':('S24','S24','S24','S19','S3', 'S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4', 'S4','S4','S4','S4','S4','S4','S4', 'S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4', 'S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4', 'S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4', 'S4','S4','S4','S4','S4','S4','S4','S4' )},skiprows=0)
+    subjClass = np.loadtxt(f, delimiter=",", dtype={'names':('classification_id','subject_id','user_id','created_at','lang', 'candels_0','candels_1','candels_2','candels_3','candels_4','candels_5','candels_6','candels_7','candels_8','candels_9','candels_10', 'candels_11','candels_12','candels_13','candels_14','candels_15','candels_16','candels_17', 'sloan_0','sloan_1','sloan_2','sloan_3','sloan_4','sloan_5','sloan_6','sloan_7','sloan_8','sloan_9','sloan_10','sloan_11', 'ukidss_0','ukidss_1','ukidss_2','ukidss_3','ukidss_4','ukidss_5','ukidss_6','ukidss_7','ukidss_8','ukidss_9','ukidss_10','ukidss_11', 'ferengi_0','ferengi_1','ferengi_2','ferengi_3','ferengi_4','ferengi_5','ferengi_6','ferengi_7','ferengi_8','ferengi_9','ferengi_10', 'ferengi_11','ferengi_12','ferengi_13','ferengi_14','ferengi_15','ferengi_16','ferengi_17','ferengi_18','old_weight','consistency','weight'), 'formats':('S24','S24','S24','S19','S3', 'S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4', 'S4','S4','S4','S4','S4','S4','S4', 'S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4', 'S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4', 'S4','S4','S4','S4','S4','S4','S4','S4','S4','S4','S4', 'S4','S4','S4','S4','S4','S4','S4','S4','D','D','D' )},skiprows=0)
 
 print '...done.'
 # Note: the full headers are:
@@ -235,6 +235,7 @@ print '...done.'
 #
 # But we are only concerned (for now) with the classification_id and the various candels_ids.
 #
+# Update: now this is reading in a file that's assumed to have weights and consistency.
 
 # There has to be a better way to do this, but for now let's do the brute force way: for each subject, find the matches to it in the classification file and add them up.
 

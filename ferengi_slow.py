@@ -23,18 +23,14 @@ def collate_classifications(ferengi_filename):
     #
     print ''
     print 'Reading %s ...' % ferengi_filename
-    #data = ascii.read(ferengi_filename, 'b')  
-    #subjects = set(data['subject_id'])
+    data = ascii.read(ferengi_filename, 'b')
     
-    # using pandas is faster even without low-memory shortcut
-    this_data = pd.read_csv(ferengi_filename,low_memory=False)
-    subjects = this_data.subject_id.unique()
-
+    subjects = set(data['subject_id'])
     
     # Now set up the collated classification columns. 
     # Each question has a question number from ferengi-0 to ferengi-18
     # Each of those questions has some number of possible answers a-0, a-1, etc. 
-    #   One question = odd features (18) has click boxes where multiple answers can be selected.
+    #   One question = odd features (07) has click boxes where multiple answers can be selected.
     #   This question alone needs to be treated differently than the others.
     # In GZ2/GZH the answer numbers were themselves unique but in Ouroboros they start at a-0 for each question number.
     #
@@ -49,7 +45,7 @@ def collate_classifications(ferengi_filename):
 
 
 
-    c01 = Column(name='subject_id', format='A24', array=strcolumn)  
+    c01 = Column(name='subject_id', format='A24', array=strcolumn)          # c05 = c01, by definition
 
     c02 = Column(name='t01_smooth_or_features_a01_smooth_frac', format='D', array=floatcolumn)
     c03 = Column(name='t01_smooth_or_features_a02_features_frac', format='D', array=floatcolumn)
@@ -142,7 +138,7 @@ def collate_classifications(ferengi_filename):
 
     c74 = Column(name='t21_clumps_embedded_a57_yes_frac', format='D', array=floatcolumn)
     c75 = Column(name='t21_clumps_embedded_a58_no_frac', format='D', array=floatcolumn)
-    c76 = Column(name='t21_clumps_embedded_count', format='J', array=floatcolumn)
+    c76 = Column(name='t21_clumps_embedded_a58_count', format='J', array=floatcolumn)
     
     c77 = Column(name='t22_discuss_a61_yes_frac', format='D', array=floatcolumn)
     c78 = Column(name='t22_discuss_a62_no_frac', format='D', array=floatcolumn)
@@ -206,6 +202,7 @@ def collate_classifications(ferengi_filename):
             'x-4':'t08_odd_feature_a23_other_frac',
             'x-5':'t08_odd_feature_a24_merger_frac',
             'x-6':'t08_odd_feature_a38_dustlane_frac',
+            'x-0':'t08_odd_feature_a99_discuss_frac',
             'count':'t08_odd_feature_count'
         }
         ,
@@ -284,7 +281,7 @@ def collate_classifications(ferengi_filename):
         'ferengi-8':{
             'a-0':'t21_clumps_embedded_a57_yes_frac',
             'a-1':'t21_clumps_embedded_a58_no_frac',
-            'count':'t21_clumps_embedded_count'
+            'count':'t21_clumps_embedded_a58_count'
         }
         
     }
@@ -292,7 +289,6 @@ def collate_classifications(ferengi_filename):
 
     #print len(frac_dict['ferengi-3'])
 
-    weird_question = 'ferengi-18'
 
 
 
@@ -301,158 +297,61 @@ def collate_classifications(ferengi_filename):
 
     subjDB = pyfits.new_table(classifications.columns)
     questions = ['ferengi-%i' % j for j in np.arange(len(frac_dict))]
-    questions.remove(weird_question)
+    questions.remove('ferengi-18')
     
     print 'Counting classifications...'
     print 'new'
+
+    for idx,s in enumerate(subjects):
+
+        if idx % 1000 == 0:
+            print idx, datetime.datetime.now().strftime('%H:%M:%S.%f')
+
+        # Find each classification for this subject
+        this_subj = (data['subject_id'] == s)
+
+        subjDB.data.field('subject_id')[idx] = s
     
-    
-    
-    for q in questions:
-    
-        print q, datetime.datetime.now().strftime('%H:%M:%S.%f')
-    
-        # groups all answers to question q by subject id and counts instances of each non-blank answer separately
-        # ON ONE LINE and 12x speed of previous method = WIN
-        this_question = this_data[q].groupby(this_data.subject_id).apply(lambda x:x.value_counts())
-        
-        # all of these comments below are because I'm not yet too familiar with pandas
-        # example output of this_question.head(10) for ferengi-1:
-        # In [59]: this_question.head(10)
-        # Out[59]: 
-        # subject_id                   
-        # 5249ce0c3ae74072a30033c1  a-1    12
-        #                           a-0     3
-        # 5249ce0c3ae74072a30033c2  a-1    20
-        #                           a-0     5
-        # 5249ce0c3ae74072a30033c3  a-1    17
-        # 5249ce0c3ae74072a30033c4  a-1    14
-        #                           a-0     4
-        #                           a-2     1
-        # 5249ce0c3ae74072a30033c5  a-1    15
-        #                           a-0     1
-        # dtype: int64
-        
-        
-        # counts total answers to all non-blank for this question (per subject id)
-        N_answer_total = this_question.sum(level=0)
-        # example output of this_question.head(10).sum(level=0):
-        #In [60]: this_question.head(10).sum(level=0)
-        #Out[60]: 
-        #subject_id
-        #5249ce0c3ae74072a30033c1    15
-        #5249ce0c3ae74072a30033c2    25
-        #5249ce0c3ae74072a30033c3    17
-        #5249ce0c3ae74072a30033c4    19
-        #5249ce0c3ae74072a30033c5    16
-        #dtype: int64
-        
-        #also note: 
-        #In [67]: this_question['5249ce0c3ae74072a30033c1']
-        #Out[67]: 
-        #a-1    12
-        #a-0     3
-        #dtype: int64
-        #
-        #In [68]: this_question['5249ce0c3ae74072a30033c1']['a-1']
-        #Out[68]: 12
-        #
-        #In [77]: this_question.head(10).sum(level=0)['5249ce0c3ae74072a30033c1']
-        #Out[77]: 15
-    
-    
-        # for some reason about 1/4 of the objects weren't actually classified
-        # and those will give a key error, so ignore them (but count them)
-        errors=0
-        for idx, s in enumerate(subjects):
-        
-            # assign subject id
-            if q == 'ferengi-0':
-                subjDB.data.field('subject_id')[idx] = s
-                
-            # assign total number count for this question
-            try:
-                subjDB.data.field(frac_dict[q]['count'])[idx] = N_answer_total[s]
-            except KeyError:
-                errors+=1
-                pass
+        # Loop over each question in the tree and record count, vote fractions
+        for q in questions:
+            ctr = Counter(data[this_subj][q])
+
+            # this is num_classifications total because it includes masked array values
+            N_total = np.sum(ctr.values())
+            # these are the rows where the user never got to this question in the tree (empty)
+            empty_answers = np.ma.count_masked(data[this_subj][q])
             
-            answers = ['a-%i' % j for j in np.arange(len(frac_dict[q]))]
+            N_this_q = N_total - empty_answers
             
-            # assign vote fractions
-            for a in answers:
+            #print q, ctr, N_total, N_this_q
+            subjDB.data.field(frac_dict[q]['count'])[idx] = N_this_q
+            for key in ctr.keys():
                 try:
-                    subjDB.data.field(frac_dict[q][a])[idx] = this_question[s][a]/float(N_answer_total[s]) if N_answer_total[s] > 0 else 0.
+                    subjDB.data.field(frac_dict[q][key])[idx] = ctr[key]/float(N_this_q) if N_this_q > 0 else 0.
                 except KeyError:
                     pass
-                
-                
-                
-                
-    # now do the weird question(s)
-    print weird_question, datetime.datetime.now().strftime('%H:%M:%S.%f')
-    
-    this_question = this_data[weird_question].groupby(this_data.subject_id).apply(lambda x:x.value_counts())
-    
-    # here's why this question is weird: users can click on more than one option, 
-    # and answers are stored as unique combinations of answer choices. e.g.:
-    #In [219]: this_question
-    #Out[219]: 
-    #subject_id                                               
-    #5249ce0c3ae74072a30033c1  a-0;x-3                            2
-    #5249ce0c3ae74072a30033c2  a-0;x-0                            1
-    #                          a-0                                1
-    #                          a-0;x-0;x-1;x-2;x-3;x-4;x-5;x-6    1
-    #5249ce0c3ae74072a30033c3  a-0                                3
-    #                          a-0;x-2;x-4;x-6                    1
-    #                          a-0;x-3                            1
-    #                          a-0;x-4                            1
-    #
-    # So we have to parse each answer combination for each subject separately.
 
-    for idx, s in enumerate(subjects):
-        try:
-            n_answers = this_question.sum(level=0)[s]
+        # Question 18 (odd features) is treated differently, since more than one answer can be selected
 
-            answer_combos = this_question[s].index
-            # e.g. second subject above:
-            #In [230]: this_question['5249ce0c3ae74072a30033c2'].index
-            #Out[230]: Index([u'a-0;x-0', u'a-0', u'a-0;x-0;x-1;x-2;x-3;x-4;x-5;x-6'], dtype='object')
-            #
-            # Now loop through these answers
-            n_combos = answer_combos.size
-            
-            for i_combo in range(0, n_combos):
-                #unpack separate answers for this index
-                these_answers = answer_combos[i_combo].split(';')
-                for this_ans in these_answers:
-                    #need to add the number of votes for the answer within this combination to the total
-                    #count, not frac (yet)
-                    
-                    # note there is an a-0, which is clicking the "next" button, and sometimes people do
-                    # get to "odd" and then not click anything but "next", but as you *must* click next
-                    # to advance, the fraction of people answering a-0 should always be 1.0, so we're skipping a-0
-                    # (it's not included in subjDB so it will throw an error when looping through keys).
+        ctr6 = Counter(data[this_subj]['ferengi-18'])
+        N_total = np.sum(ctr6.values())
+        subjDB.data.field(frac_dict['ferengi-18']['count'])[idx] = N_total
+        for key in ctr6.keys():
+            strkey = str(key)
+            splitkey = strkey.split(';')
+            if len(splitkey) > 1:
+                for sk in splitkey:
                     try:
-                        subjDB.data.field(frac_dict[q][this_ans])[idx] += this_question[s][answer_combos[i_combo]]
+                        subjDB.data.field(frac_dict['ferengi-18'][sk])[idx] += ctr6[sk]/float(N_total) if N_total > 0 else 0.
                     except KeyError:
                         pass
-                    
-            answers = ['x-%i' % j for j in np.arange(len(frac_dict[q]))]
-            #answers == np.append(aa, 'a-0')
-            
-            #now loop through answers and calculate fractions (which need not add to 1)
-            for a in answers:
+            else:
                 try:
-                    subjDB.data.field(frac_dict[q][a])[idx] = subjDB.data.field(frac_dict[q][a])[idx]/float(n_answers) if n_answers > 0 else 0.
+                    subjDB.data.field(frac_dict['ferengi-18'][key])[idx] = ctr6[key]/float(N_total) if N_total > 0 else 0.
                 except KeyError:
                     pass
-                
-        except KeyError:
-            pass
 
-
-    print 'Finished looping over classifications', datetime.datetime.now().strftime('%H:%M:%S.%f')
+    print 'Finished looping over classifications'
     
     # Write final data to FITS file
     subjDB.writeto('%s/ferengi_classifications_collated.fits' % path_class, clobber=True)
